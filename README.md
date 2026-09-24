@@ -9,7 +9,7 @@ unidades de cada modelo vendido en cada centro sobre el total. Los datos están 
 - **Arquitectura:** Clean Architecture en 4 proyectos (Domain, Application, Infrastructure, Api).
 - **Patrones:** Repository, CQRS liviano, Decorator (tiempos de ejecución), Strategy (impuestos) y
   Factory method.
-- **Calidad:** 84 tests (xUnit), cobertura de 99 % con un mínimo exigido de 80 %, reglas de SonarQube
+- **Calidad:** 85 tests (xUnit), cobertura de 99 % con un mínimo exigido de 80 %, reglas de SonarQube
   en cada build y CI en GitHub Actions.
 
 ## Índice
@@ -44,7 +44,7 @@ unidades de cada modelo vendido en cada centro sobre el total. Los datos están 
 # Levantar la API en http://localhost:5080 (abre Swagger UI)
 dotnet run --project src/CarSales.Api
 
-# Correr los 84 tests con cobertura (falla si baja de 80 %)
+# Correr los 85 tests con cobertura (falla si baja de 80 %)
 dotnet test
 ```
 
@@ -52,8 +52,9 @@ Con la API levantada hay tres formas de probar los servicios:
 
 - **Swagger UI** en <http://localhost:5080/swagger> (la raíz `/` redirige ahí), con la descripción de
   cada servicio y un botón *Try it out*.
-- El archivo [`src/CarSales.Api/CarSales.Api.http`](src/CarSales.Api/CarSales.Api.http), con un pedido
-  de ejemplo por servicio, para Visual Studio, Rider o la extensión REST Client de VS Code.
+- El archivo [`src/CarSales.Api/CarSales.Api.http`](src/CarSales.Api/CarSales.Api.http), con pedidos
+  de ejemplo de cada servicio y de los errores, para Visual Studio, Rider o la extensión REST Client
+  de VS Code.
 - `curl`, con los ejemplos de la sección siguiente.
 
 Los datos viven en memoria: al reiniciar la API vuelven a los datos mockeados originales.
@@ -62,13 +63,14 @@ Los datos viven en memoria: al reiniciar la API vuelven a los datos mockeados or
 
 ## Cómo usar los servicios
 
-| Método | Ruta                                  | Qué hace                                                    |
-| ------ | ------------------------------------- | ----------------------------------------------------------- |
-| POST   | `/api/sales`                          | Registra una venta.                                         |
-| GET    | `/api/sales/volume`                   | Volumen de ventas total.                                    |
-| GET    | `/api/sales/volume/by-center`         | Volumen de ventas de cada centro.                           |
-| GET    | `/api/sales/volume/by-center/{id}`    | Volumen de ventas de un centro.                             |
-| GET    | `/api/sales/model-share-by-center`    | Porcentaje de unidades de cada modelo en cada centro.       |
+| Método | Ruta                               | Qué hace                                                          |
+| ------ | ---------------------------------- | ----------------------------------------------------------------- |
+| POST   | `/api/sales`                       | Registra una venta.                                               |
+| GET    | `/api/sales/volume`                | Volumen de ventas total.                                          |
+| GET    | `/api/sales/volume/by-center`      | Volumen de ventas de cada centro.                                 |
+| GET    | `/api/sales/volume/by-center/{id}` | Volumen de ventas de un centro.                                   |
+| GET    | `/api/sales/model-share-by-center` | Porcentaje de unidades de cada modelo en cada centro.             |
+| GET    | `/health`                          | Estado del servicio (`Healthy`), para las sondas del orquestador. |
 
 ### Datos mockeados
 
@@ -168,12 +170,12 @@ Devuelve la matriz completa de 4 centros × 4 modelos, incluidas las combinacion
 
 Los errores siguen el formato **ProblemDetails** (RFC 9457):
 
-| Caso                                      | Código | Ejemplo de `detail` / `errors`                                           |
-| ----------------------------------------- | :----: | ------------------------------------------------------------------------ |
-| Campos inválidos o faltantes              |  400   | `"Quantity": ["La cantidad tiene que estar entre 1 y 1000."]`            |
-| Centro o modelo inexistente en la venta   |  400   | `"No existe el modelo 'Coupe'. Modelos válidos: Sedan, SUV, Offroad, Sport."` |
-| Centro inexistente en la URL              |  404   | `"No existe el centro de distribución 9."`                              |
-| Ruta inexistente / método no permitido    | 404 / 405 | Título `"Recurso no encontrado"` / `"Método no permitido"`            |
+| Caso                                    |   Código  | Ejemplo de `detail` / `errors`                                                |
+| --------------------------------------- | :-------: | ----------------------------------------------------------------------------- |
+| Campos inválidos o faltantes            |    400    | `"Quantity": ["La cantidad tiene que estar entre 1 y 1000."]`                 |
+| Centro o modelo inexistente en la venta |    400    | `"No existe el modelo 'Coupe'. Modelos válidos: Sedan, SUV, Offroad, Sport."` |
+| Centro inexistente en la URL            |    404    | `"No existe el centro de distribución 9."`                                    |
+| Ruta inexistente / método no permitido  | 404 / 405 | Título `"Recurso no encontrado"` / `"Método no permitido"`                    |
 
 El título (`title`) de cada error está en español. Si el JSON no se puede leer (por ejemplo, un
 texto en un campo numérico), el detalle técnico lo genera .NET en inglés e indica el campo con
@@ -370,8 +372,8 @@ evalúa, pero así las encararía en un sistema real:
 - **Eventos:** al registrar una venta se podría publicar un evento `SaleRegistered` (Kafka o
   RabbitMQ) para que otros sistemas (stock, facturación, logística) reaccionen sin acoplarse a
   esta API.
-- **Despliegue:** Dockerfile multi-etapa (SDK para compilar, runtime de ASP.NET Core para correr)
-  y health checks para las sondas de Kubernetes.
+- **Despliegue:** Dockerfile multi-etapa (SDK para compilar, runtime de ASP.NET Core para correr).
+  El endpoint `/health` ya queda listo para las sondas de liveness y readiness de Kubernetes.
 - **Versionado de la API** (`/api/v1/...`), cuando haya más de un consumidor.
 
 ---
@@ -382,20 +384,20 @@ evalúa, pero así las encararía en un sistema real:
 dotnet test
 ```
 
-**84 tests** en dos proyectos:
+**85 tests** en dos proyectos:
 
 | Proyecto | Tests | Qué prueba |
 | -------- | :---: | ---------- |
 | `CarSales.UnitTests` | 60 | Dominio (precios, impuesto, redondeo, validaciones), casos de uso con repositorios falsos, decorators de tiempos, registro de dependencias y repositorios en memoria (incluidas 1.000 inserciones en paralelo). |
-| `CarSales.IntegrationTests` | 24 | Cada servicio REST de punta a punta con `WebApplicationFactory` (cada test levanta su propia API con los datos mockeados originales), errores 400, 404, 405 y 415, logs de tiempos y reglas de arquitectura. |
+| `CarSales.IntegrationTests` | 25 | Cada servicio REST de punta a punta con `WebApplicationFactory` (cada test levanta su propia API con los datos mockeados originales), errores 400, 404, 405 y 415, `/health`, logs de tiempos y reglas de arquitectura. |
 
 **Cobertura:** `dotnet test` mide con coverlet y **falla si las líneas o las ramas cubiertas
 bajan de 80 %**.
 
 | Proyecto de tests | Líneas | Ramas |
 | ----------------- | :----: | :---: |
-| Unitarios         | 99,6 % | 100 %  |
-| Integración       | 99,7 % | 91,7 % |
+| Unitarios         | 100 %  | 100 %  |
+| Integración       | 99,5 % | 91,7 % |
 
 Se excluye el código que genera el compilador (logs de `LoggerMessage` y comentarios XML de OpenAPI).
 Coverlet deja los reportes en cada proyecto de tests: `coverage.opencover.xml`, para SonarQube, y
@@ -420,32 +422,41 @@ reportgenerator -reports:"tests/**/coverage.cobertura.xml" -targetdir:coverage-r
   habilitado y finales de línea LF (`.gitattributes`).
 - **Idioma:** código en inglés; comentarios, mensajes de error, README y commits en español.
 - **Commits:** [Conventional Commits](https://www.conventionalcommits.org/es/) en español, con un
-  cuerpo que explica el porqué (`feat`, `fix`, `test`, `build`, `ci`, `docs`, `chore`). La historia
-  sigue el orden en que se construyó: estructura → dominio → casos de uso → infraestructura → API →
-  tiempos → calidad.
+  cuerpo que explica el porqué (`feat`, `fix`, `refactor`, `style`, `test`, `build`, `ci`, `docs`,
+  `chore`). La historia sigue el orden en que se construyó: estructura → dominio → casos de uso →
+  infraestructura → API → tiempos → calidad, y después los ajustes que salieron de la revisión.
 
 ---
 
 ## Estimación y tiempo real
 
-|                                                                        | Horas                          |
-| ---------------------------------------------------------------------- | ------------------------------ |
-| **Estimación inicial**                                                 | **10 a 12 h** (1,5 a 2 días)   |
-| Análisis de la consigna y evaluación de alternativas de arquitectura   | ~0,5 h                         |
-| Desarrollo por capas con sus tests                                     | ~2 h                           |
-| Verificación con la API corriendo, CI y README                         | ~1 h                           |
-| **Total real**                                                         | **~3,5 h** (24/9/2026)         |
+**Estimación inicial: 10 a 12 h (1,5 a 2 días)**, pensada para hacerlo todo sin asistencia.
 
-La estimación contemplaba hacer todo sin asistencia. El tiempo real fue menor por el uso de un
-asistente de IA, que se detalla en la sección siguiente.
+Tiempo real, el 24/9/2026. Los horarios se pueden verificar en la historia de commits:
+
+| Etapa                                                                               | Horario         | Duración |
+| ----------------------------------------------------------------------------------- | --------------- | -------- |
+| Lectura de la consigna y elección entre alternativas de diseño                      | hasta las 12:11 | —        |
+| Desarrollo por capas con sus tests, verificación con la API corriendo, CI y README  | 12:11 a 12:36   | ~25 min  |
+| Revisión en profundidad, pruebas manuales y ajustes (commits posteriores al README) | 12:36 a 13:42   | ~1 h     |
+
+La diferencia con la estimación se explica por el uso de un asistente de IA, que se detalla en la
+sección siguiente.
 
 ---
 
 ## Uso de IA
 
-Desarrollé la prueba con **Claude Code** (asistente de programación con IA) como par de trabajo.
-Antes de escribir código evalué con él las alternativas de arquitectura, de medición de tiempos y de
-modelado del impuesto, y elegí las que se describen en este documento según lo que puedo sostener y
-defender. Revisé cada etapa, verifiqué los servicios con la API corriendo y me hago responsable de
-cada línea. El detalle de los montos con 2 decimales, por ejemplo, salió de probar la API real, no
-de los tests.
+Desarrollé la prueba con **Claude Code** (asistente de programación con IA) como par de trabajo:
+
+- **Diseño:** antes de escribir código evalué con el asistente alternativas de arquitectura, de
+  medición de tiempos y de modelado del impuesto, y elegí las que se describen en este documento,
+  que son las que puedo sostener y defender.
+- **Desarrollo:** el asistente escribió el código por capas, cada una con sus tests y en su propio
+  commit, y lo verificó con la API corriendo. Por eso los commits están tan cerca en el tiempo.
+- **Revisión:** revisé el código y lo probé por mi cuenta, y además pedí una revisión completa
+  partiendo de un clon del repositorio en GitHub. De ahí salieron los commits posteriores al
+  README: errores en español, fechas en UTC, código y comentarios que sobraban, y el endpoint
+  `/health`.
+
+Me hago responsable de cada línea del código.
