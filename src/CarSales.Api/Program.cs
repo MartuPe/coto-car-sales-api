@@ -20,7 +20,13 @@ builder.Services
 builder.Services.AddControllers();
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<ApiExceptionHandler>();
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options => options.AddDocumentTransformer((document, _, _) =>
+{
+    document.Info.Title = "Car Sales API";
+    document.Info.Description = "Ventas de una fábrica de autos: registrar ventas y consultar el volumen total, " +
+        "el volumen por centro de distribución y el porcentaje de unidades de cada modelo por centro.";
+    return Task.CompletedTask;
+}));
 
 var app = builder.Build();
 

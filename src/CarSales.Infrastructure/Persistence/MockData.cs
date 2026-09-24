@@ -12,10 +12,10 @@ public static class MockData
 {
     public static IReadOnlyList<CarModel> CarModels { get; } =
     [
-        new("Sedan", 8_000m, NoExtraTax.Instance),
-        new("SUV", 9_500m, NoExtraTax.Instance),
-        new("Offroad", 12_500m, NoExtraTax.Instance),
-        new("Sport", 18_200m, new PercentageTax(0.07m)),
+        new("Sedan", 8_000.00m, NoExtraTax.Instance),
+        new("SUV", 9_500.00m, NoExtraTax.Instance),
+        new("Offroad", 12_500.00m, NoExtraTax.Instance),
+        new("Sport", 18_200.00m, new PercentageTax(0.07m)),
     ];
 
     public static IReadOnlyList<DistributionCenter> DistributionCenters { get; } =

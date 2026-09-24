@@ -10,5 +10,5 @@ public sealed class NoExtraTax : ITaxPolicy
     {
     }
 
-    public decimal CalculateTax(decimal netAmount) => 0m;
+    public decimal CalculateTax(decimal netAmount) => 0.00m;
 }
