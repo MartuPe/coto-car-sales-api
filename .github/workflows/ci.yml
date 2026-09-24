@@ -1,0 +1,27 @@
+# Integración continua: en cada push o pull request compila con warnings como errores (incluidas las
+# reglas de Sonar) y corre los tests; el paso de tests falla si la cobertura baja de 80 %.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restaurar paquetes
+        run: dotnet restore
+
+      - name: Compilar
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Tests y cobertura (mínimo 80 %)
+        run: dotnet test --no-build --configuration Release
