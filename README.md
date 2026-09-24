@@ -1,5 +1,7 @@
 # API de ventas de autos · Prueba técnica .NET COTO
 
+[![CI](https://github.com/MartuPe/coto-car-sales-api/actions/workflows/ci.yml/badge.svg)](https://github.com/MartuPe/coto-car-sales-api/actions/workflows/ci.yml)
+
 API REST en **.NET 10** para una fábrica de autos con 4 modelos y 4 centros de distribución. Permite
 registrar ventas y consultar el volumen de ventas total, el volumen por centro y el porcentaje de
 unidades de cada modelo vendido en cada centro sobre el total. Los datos están mockeados en memoria.
@@ -7,7 +9,7 @@ unidades de cada modelo vendido en cada centro sobre el total. Los datos están 
 - **Arquitectura:** Clean Architecture en 4 proyectos (Domain, Application, Infrastructure, Api).
 - **Patrones:** Repository, CQRS liviano, Decorator (tiempos de ejecución), Strategy (impuestos) y
   Factory method.
-- **Calidad:** 77 tests (xUnit), cobertura de 99 % con un mínimo exigido de 80 %, reglas de SonarQube
+- **Calidad:** 84 tests (xUnit), cobertura de 99 % con un mínimo exigido de 80 %, reglas de SonarQube
   en cada build y CI en GitHub Actions.
 
 ## Índice
@@ -32,7 +34,7 @@ unidades de cada modelo vendido en cada centro sobre el total. Los datos están 
 # Levantar la API en http://localhost:5080 (abre Swagger UI)
 dotnet run --project src/CarSales.Api
 
-# Correr los 77 tests con cobertura (falla si baja de 80 %)
+# Correr los 84 tests con cobertura (falla si baja de 80 %)
 dotnet test
 ```
 
@@ -97,6 +99,7 @@ curl -X POST http://localhost:5080/api/sales \
 ```
 
 - `model` no distingue mayúsculas (`sport` también sirve) y `quantity` va de 1 a 1000.
+- La fecha de la venta (`soldAt`) se guarda y se informa en UTC.
 - La respuesta detalla el monto neto, el impuesto y el total.
 
 ### Volumen de ventas
@@ -160,6 +163,11 @@ Los errores siguen el formato **ProblemDetails** (RFC 9457):
 | Campos inválidos o faltantes              |  400   | `"Quantity": ["La cantidad tiene que estar entre 1 y 1000."]`            |
 | Centro o modelo inexistente en la venta   |  400   | `"No existe el modelo 'Coupe'. Modelos válidos: Sedan, SUV, Offroad, Sport."` |
 | Centro inexistente en la URL              |  404   | `"No existe el centro de distribución 9."`                              |
+| Ruta inexistente / método no permitido    | 404 / 405 | Título `"Recurso no encontrado"` / `"Método no permitido"`            |
+
+El título (`title`) de cada error está en español. Si el JSON no se puede leer (por ejemplo, un
+texto en un campo numérico), el detalle técnico lo genera .NET en inglés e indica el campo con
+error (`$.quantity`).
 
 ### Tiempo de ejecución
 
@@ -299,6 +307,9 @@ lógica.
 - **Un solo lugar para traducir errores:** `ApiExceptionHandler` (`IExceptionHandler` de ASP.NET
   Core) arma las respuestas ProblemDetails, así ni los controllers ni los casos de uso tienen
   try/catch. Cualquier otro error es un 500 sin detalles internos.
+- **Títulos en español y un único formato:** `ProblemDetailsTitles` define los títulos por código de
+  estado y se aplica a todas las respuestas de error, también a las que genera ASP.NET Core (validación,
+  404, 405, 415). Con `UseStatusCodePages`, los errores sin cuerpo también salen como ProblemDetails.
 
 ### Concurrencia
 
@@ -324,8 +335,9 @@ ninguna.
 mediador, y el mapeo manual (`SaleDto.From`) es explícito y fácil de seguir. Además, los dos pasaron
 a licencia comercial en 2025.
 
-**xUnit 2.9 y no xUnit v3:** xUnit v3 corre sobre la nueva plataforma de tests de Microsoft y, con
-el SDK de .NET 10, ahí coverlet puede medir cobertura pero no exigir un mínimo.
+**xUnit 2.9 y no xUnit v3:** xUnit v3 corre sobre Microsoft.Testing.Platform, la nueva plataforma
+de tests de .NET. Ahí coverlet recolecta la cobertura pero no aplica un umbral, y la consigna pide un
+mínimo de 80 %: con xUnit 2.9 y coverlet.msbuild, `dotnet test` falla si no se cumple.
 
 ---
 
@@ -360,20 +372,20 @@ evalúa, pero así las encararía en un sistema real:
 dotnet test
 ```
 
-**77 tests** en dos proyectos:
+**84 tests** en dos proyectos:
 
 | Proyecto | Tests | Qué prueba |
 | -------- | :---: | ---------- |
-| `CarSales.UnitTests` | 59 | Dominio (precios, impuesto, redondeo, validaciones), casos de uso con repositorios falsos, decorators de tiempos, registro de dependencias y repositorios en memoria (incluidas 1.000 inserciones en paralelo). |
-| `CarSales.IntegrationTests` | 18 | Cada servicio REST de punta a punta con `WebApplicationFactory` (cada test levanta su propia API con los datos mockeados originales), errores 400 y 404, logs de tiempos y reglas de arquitectura. |
+| `CarSales.UnitTests` | 60 | Dominio (precios, impuesto, redondeo, validaciones), casos de uso con repositorios falsos, decorators de tiempos, registro de dependencias y repositorios en memoria (incluidas 1.000 inserciones en paralelo). |
+| `CarSales.IntegrationTests` | 24 | Cada servicio REST de punta a punta con `WebApplicationFactory` (cada test levanta su propia API con los datos mockeados originales), errores 400, 404, 405 y 415, logs de tiempos y reglas de arquitectura. |
 
 **Cobertura:** `dotnet test` mide con coverlet y **falla si las líneas o las ramas cubiertas
 bajan de 80 %**.
 
 | Proyecto de tests | Líneas | Ramas |
 | ----------------- | :----: | :---: |
-| Unitarios         | 99,6 % | 100 % |
-| Integración       | 99,4 % | 86,4 % |
+| Unitarios         | 99,6 % | 100 %  |
+| Integración       | 99,7 % | 91,7 % |
 
 Se excluye el código que genera el compilador (logs de `LoggerMessage` y comentarios XML de OpenAPI).
 Coverlet deja los reportes en cada proyecto de tests: `coverage.opencover.xml`, para SonarQube, y
