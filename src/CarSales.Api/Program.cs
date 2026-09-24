@@ -1,3 +1,4 @@
+using CarSales.Api.Diagnostics;
 using CarSales.Api.ErrorHandling;
 using CarSales.Application;
 using CarSales.Infrastructure;
@@ -23,6 +24,8 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
+// Primero en el pipeline: así mide el request entero y registra el código final, incluso en los errores.
+app.UseMiddleware<RequestTimingMiddleware>();
 app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
