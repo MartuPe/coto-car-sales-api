@@ -18,7 +18,7 @@ builder.Services
     .AddInfrastructure();
 
 builder.Services.AddControllers();
-builder.Services.AddProblemDetails();
+builder.Services.AddProblemDetails(options => options.CustomizeProblemDetails = ProblemDetailsTitles.Apply);
 builder.Services.AddExceptionHandler<ApiExceptionHandler>();
 builder.Services.AddOpenApi(options => options.AddDocumentTransformer((document, _, _) =>
 {
@@ -33,6 +33,9 @@ var app = builder.Build();
 // Primero en el pipeline: así mide el request entero y registra el código final, incluso en los errores.
 app.UseMiddleware<RequestTimingMiddleware>();
 app.UseExceptionHandler();
+
+// Las respuestas de error sin cuerpo (ruta inexistente, método no permitido) también salen como ProblemDetails.
+app.UseStatusCodePages();
 
 if (app.Environment.IsDevelopment())
 {

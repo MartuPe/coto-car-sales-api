@@ -15,11 +15,11 @@ internal sealed class ApiExceptionHandler(IProblemDetailsService problemDetailsS
         Exception exception,
         CancellationToken cancellationToken)
     {
-        var (statusCode, title) = exception switch
+        var statusCode = exception switch
         {
-            DomainException => (StatusCodes.Status400BadRequest, "Datos inválidos"),
-            ResourceNotFoundException => (StatusCodes.Status404NotFound, "Recurso no encontrado"),
-            _ => (0, string.Empty),
+            DomainException => StatusCodes.Status400BadRequest,
+            ResourceNotFoundException => StatusCodes.Status404NotFound,
+            _ => 0,
         };
 
         // Cualquier otro error sigue al manejador por defecto: 500 sin exponer detalles internos.
@@ -28,12 +28,13 @@ internal sealed class ApiExceptionHandler(IProblemDetailsService problemDetailsS
             return false;
         }
 
+        // El título lo pone ProblemDetailsTitles según el código, igual que en el resto de los errores.
         httpContext.Response.StatusCode = statusCode;
         return await problemDetailsService.TryWriteAsync(new ProblemDetailsContext
         {
             HttpContext = httpContext,
             Exception = exception,
-            ProblemDetails = { Status = statusCode, Title = title, Detail = exception.Message },
+            ProblemDetails = { Status = statusCode, Detail = exception.Message },
         });
     }
 }

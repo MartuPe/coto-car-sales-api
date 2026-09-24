@@ -69,6 +69,7 @@ public sealed class SalesApiTests : IDisposable
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
         Assert.NotNull(problem);
+        Assert.Equal("Datos inválidos", problem.Title);
         Assert.Equal(["DistributionCenterId", "Model", "Quantity"], problem.Errors.Keys.Order());
         Assert.Equal("La cantidad tiene que estar entre 1 y 1000.", Assert.Single(problem.Errors["Quantity"]));
     }
@@ -93,9 +94,40 @@ public sealed class SalesApiTests : IDisposable
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+        Assert.Equal("Datos inválidos", problem?.Title);
         Assert.Equal(expectedDetail, problem?.Detail);
 
         Assert.Equal(MockedTotal, await _client.GetFromJsonAsync<SalesVolumeDto>("/api/sales/volume"));
+    }
+
+    [Theory]
+    [InlineData("GET", "/api/sales/no-existe", HttpStatusCode.NotFound, "Recurso no encontrado")]
+    [InlineData("GET", "/api/sales/volume/by-center/abc", HttpStatusCode.NotFound, "Recurso no encontrado")]
+    [InlineData("DELETE", "/api/sales/volume", HttpStatusCode.MethodNotAllowed, "Método no permitido")]
+    public async Task ErrorsWithoutBody_ReturnProblemDetailsInSpanish(
+        string method,
+        string url,
+        HttpStatusCode expectedStatus,
+        string expectedTitle)
+    {
+        using var request = new HttpRequestMessage(new HttpMethod(method), new Uri(url, UriKind.Relative));
+
+        var response = await _client.SendAsync(request);
+
+        Assert.Equal(expectedStatus, response.StatusCode);
+        Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+        Assert.Equal(expectedTitle, (await response.Content.ReadFromJsonAsync<ProblemDetails>())?.Title);
+    }
+
+    [Fact]
+    public async Task RegisterSale_UnsupportedContentType_Returns415InSpanish()
+    {
+        using var content = new StringContent("hola");
+
+        var response = await _client.PostAsync(new Uri("/api/sales", UriKind.Relative), content);
+
+        Assert.Equal(HttpStatusCode.UnsupportedMediaType, response.StatusCode);
+        Assert.Equal("Tipo de contenido no soportado", (await response.Content.ReadFromJsonAsync<ProblemDetails>())?.Title);
     }
 
     [Fact]

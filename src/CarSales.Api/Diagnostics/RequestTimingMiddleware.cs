@@ -21,7 +21,7 @@ internal sealed partial class RequestTimingMiddleware(RequestDelegate next, ILog
             LogRequestTime(
                 logger,
                 context.Request.Method,
-                context.Request.Path.Value ?? "/",
+                context.Request.Path.ToString(),
                 context.Response.StatusCode,
                 Stopwatch.GetElapsedTime(start).TotalMilliseconds);
         }
