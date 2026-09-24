@@ -28,7 +28,17 @@ unidades de cada modelo vendido en cada centro sobre el total. Los datos están 
 
 ## Cómo ejecutar y probar
 
-**Requisito:** [SDK de .NET 10](https://dotnet.microsoft.com/download/dotnet/10.0).
+**Requisitos:**
+
+- [SDK de .NET 10](https://dotnet.microsoft.com/download/dotnet/10.0). Alcanza para compilar, correr y
+  testear desde la consola.
+- Para abrir la solución en un IDE: **Visual Studio 2026** (versión 18 o posterior), **VS Code con
+  C# Dev Kit** o una versión de **Rider** con soporte para .NET 10.
+
+> **Visual Studio 2022 no puede abrir este proyecto.** El SDK de .NET 10 necesita MSBuild 18 y
+> Visual Studio 2022 trae el 17.x, así que no carga los proyectos y muestra *«The SDK
+> 'Microsoft.NET.Sdk' specified could not be found»*. Desde la consola funciona igual, porque
+> `dotnet` usa el MSBuild que viene dentro del SDK.
 
 ```bash
 # Levantar la API en http://localhost:5080 (abre Swagger UI)
