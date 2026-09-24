@@ -1,0 +1,36 @@
+# Pedidos de ejemplo para Visual Studio, Rider o la extensión REST Client de VS Code.
+# Levantar la API antes con: dotnet run --project src/CarSales.Api
+
+@baseUrl = http://localhost:5080
+
+### Registrar una venta: 2 Sport en el Centro Buenos Aires (incluye el 7 % de impuesto)
+POST {{baseUrl}}/api/sales
+Content-Type: application/json
+
+{
+  "distributionCenterId": 1,
+  "model": "Sport",
+  "quantity": 2
+}
+
+### Registrar una venta con datos inválidos (400 con el detalle de cada campo)
+POST {{baseUrl}}/api/sales
+Content-Type: application/json
+
+{
+  "distributionCenterId": 9,
+  "model": "Coupe",
+  "quantity": 0
+}
+
+### Volumen de ventas total
+GET {{baseUrl}}/api/sales/volume
+
+### Volumen de ventas por centro
+GET {{baseUrl}}/api/sales/volume/by-center
+
+### Volumen de ventas de un centro
+GET {{baseUrl}}/api/sales/volume/by-center/3
+
+### Porcentaje de unidades de cada modelo en cada centro sobre el total
+GET {{baseUrl}}/api/sales/model-share-by-center

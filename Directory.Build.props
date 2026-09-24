@@ -5,5 +5,9 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!-- Genera el XML de los comentarios /// para que Swagger muestre la descripción de cada servicio.
+         CS1591 (miembro público sin comentario) se omite: se documenta lo que aporta, no cada propiedad. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
 </Project>
