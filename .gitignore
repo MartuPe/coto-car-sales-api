@@ -481,8 +481,5 @@ $RECYCLE.BIN/
 # Vim temporary swap files
 *.swp
 
-# Reportes de cobertura (coverlet)
-coverage.json
-coverage.cobertura.xml
-coverage.opencover.xml
+# Reporte HTML de cobertura generado con ReportGenerator (ver README)
 coverage-report/
