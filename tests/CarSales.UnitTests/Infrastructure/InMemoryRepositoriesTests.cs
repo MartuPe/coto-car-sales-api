@@ -28,6 +28,12 @@ public class InMemoryRepositoriesTests
         Assert.Equal(50, MockData.CreateInitialSales().Sum(s => s.Quantity));
     }
 
+    [Fact]
+    public void MockData_InitialSalesAreInUtcLikeTheNewOnes()
+    {
+        Assert.All(MockData.CreateInitialSales(), sale => Assert.Equal(TimeSpan.Zero, sale.SoldAt.Offset));
+    }
+
     [Theory]
     [InlineData("Sport")]
     [InlineData("sport")]

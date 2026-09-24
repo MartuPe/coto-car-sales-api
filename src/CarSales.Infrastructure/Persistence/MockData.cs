@@ -40,10 +40,11 @@ public static class MockData
             (1, 4, "Sedan", 2), (2, 4, "SUV", 3), (3, 4, "Offroad", 4), (4, 4, "Offroad", 2), (5, 4, "Sport", 1),
         ];
 
+        // En UTC, igual que las ventas nuevas (TimeProvider.GetUtcNow()): 13:00 UTC son las 10:00 de Argentina.
         return sales.Select(sale => Sale.Create(
             DistributionCenters.Single(c => c.Id == sale.CenterId),
             CarModels.Single(m => m.Name == sale.Model),
             sale.Quantity,
-            new DateTimeOffset(2026, 9, sale.Day, 10, 0, 0, TimeSpan.FromHours(-3))));
+            new DateTimeOffset(2026, 9, sale.Day, 13, 0, 0, TimeSpan.Zero)));
     }
 }
