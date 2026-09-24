@@ -190,6 +190,15 @@ public sealed class SalesApiTests : IDisposable
     }
 
     [Fact]
+    public async Task Health_ReturnsHealthy()
+    {
+        var response = await _client.GetAsync(new Uri("/health", UriKind.Relative));
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("Healthy", await response.Content.ReadAsStringAsync());
+    }
+
+    [Fact]
     public async Task ExceptionHandler_LeavesUnknownErrorsToTheDefaultHandler()
     {
         var handler = new ApiExceptionHandler(_factory.Services.GetRequiredService<IProblemDetailsService>());

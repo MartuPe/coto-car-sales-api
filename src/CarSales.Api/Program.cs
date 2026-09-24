@@ -20,6 +20,7 @@ builder.Services
 builder.Services.AddControllers();
 builder.Services.AddProblemDetails(options => options.CustomizeProblemDetails = ProblemDetailsTitles.Apply);
 builder.Services.AddExceptionHandler<ApiExceptionHandler>();
+builder.Services.AddHealthChecks();
 builder.Services.AddOpenApi(options => options.AddDocumentTransformer((document, _, _) =>
 {
     document.Info.Title = "Car Sales API";
@@ -46,5 +47,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapControllers();
+
+// Sonda de salud para el orquestador (liveness/readiness en Kubernetes): responde 200 "Healthy".
+app.MapHealthChecks("/health");
 
 await app.RunAsync();
