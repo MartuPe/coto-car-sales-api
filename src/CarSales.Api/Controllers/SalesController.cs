@@ -39,6 +39,7 @@ public sealed class SalesController : ControllerBase
     }
 
     /// <summary>Volumen de ventas total de la empresa: unidades y montos (neto, impuesto y total).</summary>
+    /// <response code="200">Unidades vendidas, monto neto, impuesto y total de todas las ventas.</response>
     [HttpGet("volume")]
     [ProducesResponseType<SalesVolumeDto>(StatusCodes.Status200OK)]
     public Task<SalesVolumeDto> GetTotalVolume(
@@ -47,6 +48,7 @@ public sealed class SalesController : ControllerBase
         handler.HandleAsync(new GetTotalSalesVolumeQuery(), cancellationToken);
 
     /// <summary>Volumen de ventas de cada centro de distribución (incluye los centros sin ventas).</summary>
+    /// <response code="200">Un elemento por centro, con su volumen de ventas.</response>
     [HttpGet("volume/by-center")]
     [ProducesResponseType<IReadOnlyList<CenterSalesVolumeDto>>(StatusCodes.Status200OK)]
     public Task<IReadOnlyList<CenterSalesVolumeDto>> GetVolumeByCenter(
@@ -58,6 +60,7 @@ public sealed class SalesController : ControllerBase
     /// <param name="distributionCenterId">Id del centro (1 a 4).</param>
     /// <param name="handler">Caso de uso (lo inyecta el contenedor de dependencias).</param>
     /// <param name="cancellationToken">Se cancela si el cliente corta la conexión.</param>
+    /// <response code="200">Volumen de ventas del centro pedido.</response>
     /// <response code="404">El centro no existe.</response>
     [HttpGet("volume/by-center/{distributionCenterId:int}")]
     [ProducesResponseType<CenterSalesVolumeDto>(StatusCodes.Status200OK)]
@@ -72,6 +75,7 @@ public sealed class SalesController : ControllerBase
     /// Porcentaje de unidades de cada modelo vendido en cada centro sobre el total de ventas de la empresa.
     /// </summary>
     /// <remarks>Las celdas centro × modelo suman 100 % (con diferencias de centésimos por el redondeo).</remarks>
+    /// <response code="200">Total de unidades y, por centro, las unidades y el porcentaje de cada modelo.</response>
     [HttpGet("model-share-by-center")]
     [ProducesResponseType<ModelShareReportDto>(StatusCodes.Status200OK)]
     public Task<ModelShareReportDto> GetModelShareByCenter(
