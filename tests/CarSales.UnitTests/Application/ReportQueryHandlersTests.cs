@@ -88,11 +88,13 @@ public class ReportQueryHandlersTests
             result.Centers,
             north =>
             {
+                Assert.Equal(1, north.DistributionCenterId);
                 Assert.Equal("Centro Norte", north.DistributionCenterName);
                 Assert.Equal([new("Sedan", 3, 60m), new("Sport", 1, 20m)], north.Models);
             },
             south =>
             {
+                Assert.Equal(2, south.DistributionCenterId);
                 Assert.Equal("Centro Sur", south.DistributionCenterName);
                 Assert.Equal([new("Sedan", 1, 20m), new("Sport", 0, 0m)], south.Models);
             });

@@ -46,7 +46,7 @@ public class SaleTests
         var exception = Assert.Throws<DomainException>(
             () => Sale.Create(TestData.North, TestData.Sedan, quantity, TestData.Now));
 
-        Assert.Contains("mayor a cero", exception.Message);
+        Assert.Contains("mayor a cero", exception.Message, StringComparison.Ordinal);
     }
 
     [Fact]

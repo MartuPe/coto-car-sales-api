@@ -7,7 +7,7 @@ namespace CarSales.Api.ErrorHandling;
 /// </summary>
 internal static class ProblemDetailsTitles
 {
-    private static readonly Dictionary<int, string> SpanishTitles = new()
+    private static readonly Dictionary<int, string> _spanishTitles = new()
     {
         [StatusCodes.Status400BadRequest] = "Datos inválidos",
         [StatusCodes.Status404NotFound] = "Recurso no encontrado",
@@ -20,7 +20,7 @@ internal static class ProblemDetailsTitles
     public static void Apply(ProblemDetailsContext context)
     {
         var problem = context.ProblemDetails;
-        if (problem.Status is { } status && SpanishTitles.TryGetValue(status, out var title))
+        if (problem.Status is { } status && _spanishTitles.TryGetValue(status, out var title))
         {
             problem.Title = title;
         }

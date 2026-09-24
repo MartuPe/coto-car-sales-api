@@ -19,7 +19,7 @@ namespace CarSales.IntegrationTests;
 public sealed class SalesApiTests : IDisposable
 {
     // Totales de los datos mockeados: 50 unidades, 6 de ellas Sport (6 x 1.274 de impuesto).
-    private static readonly SalesVolumeDto MockedTotal = new(50, 542_200m, 7_644m, 549_844m);
+    private static readonly SalesVolumeDto _mockedTotal = new(50, 542_200m, 7_644m, 549_844m);
 
     private readonly WebApplicationFactory<Program> _factory = new();
     private readonly HttpClient _client;
@@ -40,7 +40,7 @@ public sealed class SalesApiTests : IDisposable
     {
         var volume = await _client.GetFromJsonAsync<SalesVolumeDto>("/api/sales/volume");
 
-        Assert.Equal(MockedTotal, volume);
+        Assert.Equal(_mockedTotal, volume);
     }
 
     [Fact]
@@ -97,7 +97,7 @@ public sealed class SalesApiTests : IDisposable
         Assert.Equal("Datos inválidos", problem?.Title);
         Assert.Equal(expectedDetail, problem?.Detail);
 
-        Assert.Equal(MockedTotal, await _client.GetFromJsonAsync<SalesVolumeDto>("/api/sales/volume"));
+        Assert.Equal(_mockedTotal, await _client.GetFromJsonAsync<SalesVolumeDto>("/api/sales/volume"));
     }
 
     [Theory]
@@ -181,7 +181,7 @@ public sealed class SalesApiTests : IDisposable
     public async Task OpenApi_DocumentsTheServicesAndTheRootRedirectsToSwagger()
     {
         var document = await _client.GetStringAsync(new Uri("/openapi/v1.json", UriKind.Relative));
-        Assert.Contains("/api/sales/model-share-by-center", document);
+        Assert.Contains("/api/sales/model-share-by-center", document, StringComparison.Ordinal);
 
         using var client = _factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
         var response = await client.GetAsync(new Uri("/", UriKind.Relative));

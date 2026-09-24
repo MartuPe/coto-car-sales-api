@@ -37,7 +37,7 @@ public class ExecutionTimingTests
 
         Assert.Equal(3, result);
         var log = Assert.Single(_logger.Collector.GetSnapshot());
-        Assert.StartsWith("LengthCommandHandler.HandleAsync se ejecutó en", log.Message);
+        Assert.StartsWith("LengthCommandHandler.HandleAsync se ejecutó en", log.Message, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -46,7 +46,7 @@ public class ExecutionTimingTests
         await Assert.ThrowsAsync<InvalidOperationException>(
             () => _timer.MeasureAsync<int>("Falla", () => throw new InvalidOperationException("error")));
 
-        Assert.StartsWith("Falla se ejecutó en", Assert.Single(_logger.Collector.GetSnapshot()).Message);
+        Assert.StartsWith("Falla se ejecutó en", Assert.Single(_logger.Collector.GetSnapshot()).Message, StringComparison.Ordinal);
     }
 
     [Fact]
