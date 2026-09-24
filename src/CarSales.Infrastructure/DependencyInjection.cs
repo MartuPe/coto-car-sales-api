@@ -8,7 +8,8 @@ public static class DependencyInjection
 {
     /// <summary>
     /// Registra los repositorios en memoria. Son singleton porque los datos tienen que sobrevivir entre
-    /// requests; para pasar a una base real alcanza con cambiar estas tres líneas.
+    /// requests. Para pasar a una base real se registran acá las nuevas implementaciones, sin tocar los
+    /// casos de uso.
     /// </summary>
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {

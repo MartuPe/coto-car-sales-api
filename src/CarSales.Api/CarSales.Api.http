@@ -13,14 +13,24 @@ Content-Type: application/json
   "quantity": 2
 }
 
-### Registrar una venta con datos inválidos (400 con el detalle de cada campo)
+### Datos inválidos: 400 con un error por campo
+POST {{baseUrl}}/api/sales
+Content-Type: application/json
+
+{
+  "distributionCenterId": 0,
+  "model": "",
+  "quantity": 0
+}
+
+### Centro inexistente: 400 que lista los centros válidos
 POST {{baseUrl}}/api/sales
 Content-Type: application/json
 
 {
   "distributionCenterId": 9,
-  "model": "Coupe",
-  "quantity": 0
+  "model": "Sedan",
+  "quantity": 1
 }
 
 ### Volumen de ventas total
@@ -31,6 +41,9 @@ GET {{baseUrl}}/api/sales/volume/by-center
 
 ### Volumen de ventas de un centro
 GET {{baseUrl}}/api/sales/volume/by-center/3
+
+### Centro inexistente en la URL: 404
+GET {{baseUrl}}/api/sales/volume/by-center/9
 
 ### Porcentaje de unidades de cada modelo en cada centro sobre el total
 GET {{baseUrl}}/api/sales/model-share-by-center

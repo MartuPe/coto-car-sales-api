@@ -71,7 +71,7 @@ public sealed class SalesController : ControllerBase
     /// <summary>
     /// Porcentaje de unidades de cada modelo vendido en cada centro sobre el total de ventas de la empresa.
     /// </summary>
-    /// <remarks>La suma de todas las celdas centro × modelo da 100 %.</remarks>
+    /// <remarks>Las celdas centro × modelo suman 100 % (con diferencias de centésimos por el redondeo).</remarks>
     [HttpGet("model-share-by-center")]
     [ProducesResponseType<ModelShareReportDto>(StatusCodes.Status200OK)]
     public Task<ModelShareReportDto> GetModelShareByCenter(
