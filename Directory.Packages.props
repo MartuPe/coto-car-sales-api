@@ -3,6 +3,11 @@
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
+  <ItemGroup Label="Análisis estático">
+    <!-- Reglas de SonarQube corriendo en cada build de todos los proyectos. Con TreatWarningsAsErrors,
+         un hallazgo de Sonar rompe la compilación, igual que un quality gate en el pipeline. -->
+    <GlobalPackageReference Include="SonarAnalyzer.CSharp" Version="10.34.0.3385" />
+  </ItemGroup>
   <ItemGroup Label="Aplicación">
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.12" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.12" />
