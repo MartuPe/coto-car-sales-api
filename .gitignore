@@ -484,4 +484,5 @@ $RECYCLE.BIN/
 # Reportes de cobertura (coverlet)
 coverage.json
 coverage.cobertura.xml
+coverage.opencover.xml
 coverage-report/
