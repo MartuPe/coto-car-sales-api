@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\CarSales.Domain\CarSales.Domain.csproj" />
+    <ProjectReference Include="..\..\src\CarSales.Application\CarSales.Application.csproj" />
+    <ProjectReference Include="..\..\src\CarSales.Infrastructure\CarSales.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.Testing" />
+  </ItemGroup>
+
+</Project>

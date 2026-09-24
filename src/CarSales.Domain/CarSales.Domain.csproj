@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Núcleo del negocio: no depende de ningún otro proyecto ni paquete. -->
+
+</Project>
