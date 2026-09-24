@@ -1,3 +1,4 @@
+using System.Globalization;
 using CarSales.Domain.Sales;
 
 namespace CarSales.UnitTests.Domain;
@@ -5,9 +6,14 @@ namespace CarSales.UnitTests.Domain;
 public class SalesVolumeTests
 {
     [Fact]
-    public void From_NoSales_ReturnsEmpty()
+    public void From_NoSales_ReturnsZeroesWithTwoDecimals()
     {
-        Assert.Equal(SalesVolume.Empty, SalesVolume.From([]));
+        var volume = SalesVolume.From([]);
+
+        Assert.Equal(0, volume.Units);
+        Assert.Equal("0.00", volume.NetAmount.ToString(CultureInfo.InvariantCulture));
+        Assert.Equal("0.00", volume.TaxAmount.ToString(CultureInfo.InvariantCulture));
+        Assert.Equal("0.00", volume.TotalAmount.ToString(CultureInfo.InvariantCulture));
     }
 
     [Fact]
